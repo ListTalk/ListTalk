@@ -202,7 +202,7 @@
           (error "define-method expects method signature"))))
 
 (ListTalk:define-macro (ListTalk:define-generic signature . options)
-  "Define a documented generic function with an optional method combination."
+  "Define a generic function with an optional method combination."
   (define (documentation-expression options)
     (if (and (pair? options) (string? (car options)))
         (car options)
