@@ -283,6 +283,18 @@
 (define-class DefPoint (Object) (x y))
 (let ((inst (make-instance DefPoint)))
   (check (eq? (type-of inst) DefPoint) "define-class wraps make-class and define"))
+(check (null? [DefPoint documentation])
+       "define-class defaults documentation to nil")
+
+(define-class DefDocumentedPoint (Object) (x y)
+  :documentation "A documented point class.")
+(check (equal? [DefDocumentedPoint documentation]
+               "A documented point class.")
+       "define-class accepts :documentation")
+(check-raises "make-class rejects unknown options"
+  (make-class 'DefBadClassOption (list Object) '() :unknown "bad"))
+(check-raises "define-class requires string documentation"
+  (define-class DefBadClassDocumentation (Object) () :documentation 42))
 
 (define-method [Pair first] .car)
 (check (= [(cons 9 8) first] 9) "define-method installs zero-argument method")

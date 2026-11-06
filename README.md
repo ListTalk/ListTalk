@@ -164,7 +164,8 @@ or writes a slot on `ListTalk:self`:
 Classes and methods are defined in ListTalk code:
 
 ```scheme
-(define-class Point (Object) (x y))
+(define-class Point (Object) (x y)
+  :documentation "A two-dimensional point.")
 
 (define-constructor [Point newX: x y: y]
   (set! .x x)

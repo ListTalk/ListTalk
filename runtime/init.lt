@@ -123,12 +123,23 @@
                   (error "set! unsupported target")))
           (error "set! unsupported target"))))
 
-(ListTalk:define-macro (ListTalk:define-class name superclasses slot-names)
-  "Define a class with superclasses and slot names."
+(ListTalk:define-macro (ListTalk:define-class name superclasses slot-names . options)
+  "Define a class with superclasses, slot names, and optional documentation."
+  (define documentation
+    (cond
+      ((null? options) #nil)
+      ((and (pair? options)
+            (eq? (car options) :documentation)
+            (pair? (cdr options))
+            (null? (cddr options)))
+       (cadr options))
+      (#true
+       (error "define-class expects optional :documentation string"))))
   `(define ,name
      (make-class ',name
                  (list ,@superclasses)
-                 ',slot-names)))
+                 ',slot-names
+                 :documentation ,documentation)))
 
 (ListTalk:define-macro (ListTalk:define-method signature . body)
   "Define a single-dispatch method or a method on a generic function."

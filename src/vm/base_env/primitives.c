@@ -587,21 +587,38 @@ LT_DEFINE_PRIMITIVE(
 LT_DEFINE_PRIMITIVE(
     primitive_make_class,
     "make-class",
-    "(name superclasses slot-names)",
-    "Create class with name, superclasses list, and slot-name list."
+    "(name superclasses slot-names :key documentation)",
+    "Create class with name, superclasses, slots, and optional documentation."
 ){
     LT_Value cursor = arguments;
     LT_Value name;
     LT_Value superclasses;
     LT_Value slot_names;
+    LT_Value keyword;
+    LT_Value documentation = LT_NIL;
+    LT_Value class_value;
     (void)tail_call_unwind_marker;
 
     LT_OBJECT_ARG(cursor, name);
     LT_OBJECT_ARG(cursor, superclasses);
     LT_OBJECT_ARG(cursor, slot_names);
+
+    if (cursor != LT_NIL){
+        LT_OBJECT_ARG(cursor, keyword);
+        if (!keyword_named_p(keyword, "documentation")){
+            LT_error("make-class expects :documentation keyword");
+        }
+        LT_OBJECT_ARG(cursor, documentation);
+    }
     LT_ARG_END(cursor);
 
-    return LT_Class_new(name, superclasses, slot_names);
+    if (documentation != LT_NIL && !LT_String_p(documentation)){
+        LT_type_error(documentation, &LT_String_class);
+    }
+
+    class_value = LT_Class_new(name, superclasses, slot_names);
+    LT_Class_from_object(class_value)->documentation = documentation;
+    return class_value;
 }
 
 LT_DEFINE_PRIMITIVE(
