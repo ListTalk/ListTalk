@@ -185,7 +185,8 @@ Generic functions support dispatch on the classes of multiple arguments. An
 unspecialized parameter is shorthand for an `Object` specializer:
 
 ```scheme
-(define-generic (collide left right))
+(define-generic (collide left right)
+  "Describe a collision between two objects.")
 
 (define-method (collide (left Circle) (right Circle))
   :two-circles)
@@ -225,7 +226,9 @@ effective function:
 `GenericFunction` and `GenericMethod` expose this machinery through ordinary
 message sends, including `methods`, `addMethod:`, `computeApplicableMethods:`,
 `computeEffectiveMethod:`, `specializers`, `qualifier`, and
-`invokeWithArguments:nextMethod:`.
+`invokeWithArguments:nextMethod:`. Generic functions expose their declared
+`documentation` and `arguments`; generic methods forward those selectors to
+their underlying functions.
 
 The core runtime includes native classes for objects, booleans, nil, symbols,
 strings, lists, vectors, bytevectors, numbers, dictionaries, sets, functions,

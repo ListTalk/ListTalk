@@ -393,6 +393,23 @@
 (check (eq? (type-of (car [generic-speak methods])) GenericMethod)
        "GenericFunction MOP uses GenericMethod instances")
 
+(define-generic (generic-documented value)
+  "Documentation for a generic function.")
+(define-method (generic-documented (value GenericAnimal))
+  "Documentation for a generic method."
+  :documented)
+(let ((method (car [generic-documented methods])))
+  (check (equal? [generic-documented documentation]
+                 "Documentation for a generic function.")
+         "GenericFunction>>documentation returns define-generic documentation")
+  (check (equal? [generic-documented arguments] '(value))
+         "GenericFunction>>arguments returns its parameter list")
+  (check (equal? [method documentation]
+                 "Documentation for a generic method.")
+         "GenericMethod>>documentation delegates to its function")
+  (check (equal? [method arguments] '(value))
+         "GenericMethod>>arguments delegates to its function"))
+
 (define-method (generic-speak (value GenericDog)) :redefined-dog)
 (check (eq? (generic-speak (make-instance GenericDog)) :redefined-dog)
        "redefining an equally specialized method replaces it")

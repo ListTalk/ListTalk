@@ -191,7 +191,15 @@
           (error "define-method expects method signature"))))
 
 (ListTalk:define-macro (ListTalk:define-generic signature . options)
-  "Define a generic function, optionally with :method-combination function."
+  "Define a documented generic function with an optional method combination."
+  (define (documentation-expression options)
+    (if (and (pair? options) (string? (car options)))
+        (car options)
+        #nil))
+  (define (method-options options)
+    (if (and (pair? options) (string? (car options)))
+        (cdr options)
+        options))
   (define (method-combination-expression options)
     (cond
       ((null? options) #nil)
@@ -216,10 +224,11 @@
          ,(car signature)
          (ListTalk:send
            ListTalk:GenericFunction
-           :newNamed:parameters:methodCombination:
+           :newNamed:parameters:documentation:methodCombination:
            ',(car signature)
            ',(cdr signature)
-           ,(method-combination-expression options)))
+           ,(documentation-expression options)
+           ,(method-combination-expression (method-options options))))
       (error "define-generic expects (name parameter ...) signature")))
 
 (ListTalk:define-macro (ListTalk:define-constructor signature . body)
@@ -433,6 +442,12 @@
 (ListTalk:define-method [ListTalk:GenericMethod function]
   .function)
 
+(ListTalk:define-method [ListTalk:GenericMethod documentation]
+  [.function documentation])
+
+(ListTalk:define-method [ListTalk:GenericMethod arguments]
+  [.function arguments])
+
 (ListTalk:define
   (ListTalk-implementation:%generic-class-position class classes)
   (let loop ((remaining classes) (position 0))
@@ -489,11 +504,12 @@
     .function arguments next-method))
 
 (ListTalk:define-class ListTalk:GenericFunction (ListTalk:Function)
-  (name parameters methods method-combination))
+  (name parameters documentation methods method-combination))
 
 (ListTalk:define-constructor
   [ListTalk:GenericFunction newNamed: name
                             parameters: parameters
+                            documentation: documentation
                             methodCombination: method-combination]
   (if (symbol? name)
       #true
@@ -501,11 +517,15 @@
   (if (every symbol? parameters)
       #true
       (error "Generic function parameters must be symbols"))
+  (if (or (null? documentation) (string? documentation))
+      #true
+      (error "Generic function documentation must be string or nil"))
   (if (or (null? method-combination) (function? method-combination))
       #true
       (error "Method combination must be function or nil"))
   (set! .name name)
   (set! .parameters parameters)
+  (set! .documentation documentation)
   (set! .methods '())
   (set! .method-combination method-combination))
 
@@ -519,7 +539,7 @@
   .parameters)
 
 (ListTalk:define-method [ListTalk:GenericFunction documentation]
-  #nil)
+  .documentation)
 
 (ListTalk:define-method [ListTalk:GenericFunction methods]
   .methods)
