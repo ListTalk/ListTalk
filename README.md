@@ -187,7 +187,7 @@ unspecialized parameter is shorthand for an `Object` specializer:
 
 ```scheme
 (define-generic (collide left right)
-  "Describe a collision between two objects.")
+  :documentation "Describe a collision between two objects.")
 
 (define-method (collide (left Circle) (right Circle))
   :two-circles)
@@ -221,7 +221,7 @@ effective function:
       [method invokeWithArguments: arguments nextMethod: #nil])))
 
 (define-generic (classify value)
-  (:method-combination first-method-combination))
+  :method-combination first-method-combination)
 ```
 
 `GenericFunction` and `GenericMethod` expose this machinery through ordinary

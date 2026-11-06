@@ -406,7 +406,7 @@
        "GenericFunction MOP uses GenericMethod instances")
 
 (define-generic (generic-documented value)
-  "Documentation for a generic function.")
+  :documentation "Documentation for a generic function.")
 (define-method (generic-documented (value GenericAnimal))
   "Documentation for a generic method."
   :documented)
@@ -537,13 +537,17 @@
     (lambda arguments
       [selected invokeWithArguments: arguments nextMethod: #nil])))
 (define-generic (generic-custom value)
-  (:method-combination generic-custom-combination))
+  :method-combination generic-custom-combination
+  :documentation "A generic with a custom method combination.")
 (define-method (generic-custom value) :object)
 (define-method (generic-custom (value GenericCustomBase)) :base)
 (define-method (generic-custom (value GenericCustomChild)) :child)
 
 (check (eq? (generic-custom (make-instance GenericCustomChild)) :child)
        "user method combination returns the effective function")
+(check (equal? [generic-custom documentation]
+               "A generic with a custom method combination.")
+       "define-generic accepts keyword options in any order")
 (check (equal? generic-custom-sorted-specializers
                (list GenericCustomChild GenericCustomBase Object))
        "user method combination receives sorted applicable methods")

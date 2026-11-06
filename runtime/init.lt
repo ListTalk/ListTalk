@@ -201,33 +201,9 @@
               (error "Qualified define-method requires a signature"))
           (error "define-method expects method signature"))))
 
-(ListTalk:define-macro (ListTalk:define-generic signature . options)
-  "Define a generic function with an optional method combination."
-  (define (documentation-expression options)
-    (if (and (pair? options) (string? (car options)))
-        (car options)
-        #nil))
-  (define (method-options options)
-    (if (and (pair? options) (string? (car options)))
-        (cdr options)
-        options))
-  (define (method-combination-expression options)
-    (cond
-      ((null? options) #nil)
-      ((and (pair? options)
-            (eq? (car options) :method-combination)
-            (pair? (cdr options))
-            (null? (cddr options)))
-       (cadr options))
-      ((and (pair? options)
-            (null? (cdr options))
-            (pair? (car options))
-            (eq? (caar options) :method-combination)
-            (pair? (cdar options))
-            (null? (cddar options)))
-       (cadar options))
-      (#true
-       (error "define-generic expects optional :method-combination function"))))
+(ListTalk:define-macro (ListTalk:define-generic signature
+                       :key documentation method-combination)
+  "Define a generic function with optional documentation and method combination."
   (if (and (pair? signature)
            (symbol? (car signature))
            (every symbol? (cdr signature)))
@@ -238,8 +214,8 @@
            :newNamed:parameters:documentation:methodCombination:
            ',(car signature)
            ',(cdr signature)
-           ,(documentation-expression options)
-           ,(method-combination-expression (method-options options))))
+           ,documentation
+           ,method-combination))
       (error "define-generic expects (name parameter ...) signature")))
 
 (ListTalk:define-macro (ListTalk:define-constructor signature . body)
