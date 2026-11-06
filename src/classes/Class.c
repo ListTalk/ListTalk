@@ -1109,7 +1109,7 @@ LT_Value LT_Class_new(LT_Value name, LT_Value superclasses, LT_Value slot_names)
     LT_ilc_epoch_copy_acquire_release(&klass->method_cache_epoch);
     klass->name = name;
     if (primary_superclass != NULL){
-        klass->debugPrintOn = primary_superclass->debugPrintOn;
+        klass->debugPrintOn = NULL;
         klass->hash = primary_superclass->hash;
         klass->equal_p = primary_superclass->equal_p;
     } else {
