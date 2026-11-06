@@ -515,6 +515,12 @@
 (ListTalk:define-method [ListTalk:GenericFunction parameters]
   .parameters)
 
+(ListTalk:define-method [ListTalk:GenericFunction arguments]
+  .parameters)
+
+(ListTalk:define-method [ListTalk:GenericFunction documentation]
+  #nil)
+
 (ListTalk:define-method [ListTalk:GenericFunction methods]
   .methods)
 
