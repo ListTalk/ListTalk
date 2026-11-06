@@ -181,6 +181,52 @@ Classes and methods are defined in ListTalk code:
   (sqrt (+ (* .x .x) (* .y .y))))
 ```
 
+Generic functions support dispatch on the classes of multiple arguments. An
+unspecialized parameter is shorthand for an `Object` specializer:
+
+```scheme
+(define-generic (collide left right))
+
+(define-method (collide (left Circle) (right Circle))
+  :two-circles)
+
+(define-method (collide (left Shape) right)
+  (call-next-method))
+
+(define-method (collide left right)
+  :default)
+```
+
+The standard method combination accepts `:before`, `:after`, and `:around`
+qualifiers, written either before the signature or after the generic name:
+
+```scheme
+(define-method :before (collide (left Shape) right)
+  (display "checking collision\n"))
+
+(define-method (collide :around (left Shape) right)
+  (call-next-method))
+```
+
+A generic can instead use a combination function. It receives the applicable
+`GenericMethod` objects, sorted from most to least specific, and returns the
+effective function:
+
+```scheme
+(define (first-method-combination methods)
+  (let ((method (car methods)))
+    (lambda arguments
+      [method invokeWithArguments: arguments nextMethod: #nil])))
+
+(define-generic (classify value)
+  (:method-combination first-method-combination))
+```
+
+`GenericFunction` and `GenericMethod` expose this machinery through ordinary
+message sends, including `methods`, `addMethod:`, `computeApplicableMethods:`,
+`computeEffectiveMethod:`, `specializers`, `qualifier`, and
+`invokeWithArguments:nextMethod:`.
+
 The core runtime includes native classes for objects, booleans, nil, symbols,
 strings, lists, vectors, bytevectors, numbers, dictionaries, sets, functions,
 macros, packages, streams, weak references, conditions, restarts, and date/time
